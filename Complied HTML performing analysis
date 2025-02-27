@@ -1,0 +1,58 @@
+# Melihat jumlah missing values di setiap kolom
+missing_values = df_csv.isnull().sum()
+
+# Menghapus baris yang memiliki missing values pada kolom numerik utama
+df_clean = df_csv.dropna(subset=numeric_columns)
+
+# Menampilkan jumlah data sebelum dan sesudah pembersihan
+data_before = df_csv.shape[0]
+data_after = df_clean.shape[0]
+
+missing_values, data_before, data_after
+
+# Menghitung statistik deskriptif untuk skor SAT
+sat_statistics = df_clean[numeric_columns].describe()
+
+# Menampilkan statistik deskriptif
+sat_statistics
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Plot hubungan jumlah peserta tes dengan skor SAT (scatter plot)
+plt.figure(figsize=(12, 5))
+sns.scatterplot(x=df_clean["Num of SAT Test Takers"], y=df_clean["SAT Math Avg. Score"], label="Math", alpha=0.6)
+sns.scatterplot(x=df_clean["Num of SAT Test Takers"], y=df_clean["SAT Critical Reading Avg. Score"], label="Reading", alpha=0.6)
+sns.scatterplot(x=df_clean["Num of SAT Test Takers"], y=df_clean["SAT Writing Avg. Score"], label="Writing", alpha=0.6)
+plt.xlabel("Jumlah Peserta SAT")
+plt.ylabel("Rata-rata Skor SAT")
+plt.title("Hubungan antara Jumlah Peserta SAT dan Skor Rata-rata SAT")
+plt.legend()
+plt.show()
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+
+# Memilih fitur dan target untuk prediksi skor SAT Math
+features = ["Num of SAT Test Takers"]
+target = "SAT Math Avg. Score"
+
+# Memisahkan data menjadi training dan testing set
+X = df_clean[features]
+y = df_clean[target]
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Melatih model regresi linear
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Memprediksi nilai pada data uji
+y_pred = model.predict(X_test)
+
+# Mengevaluasi model
+rmse = mean_squared_error(y_test, y_pred, squared=False)
+r2 = r2_score(y_test, y_pred)
+
+rmse, r2
+
